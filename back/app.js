@@ -43,6 +43,7 @@ db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', () => console.debug('CONNECTED'));
 mongoose.set('debug', true);
 require('./models/Users');
+require('./models/Posts');
 require('./config/passport');
 app.use(require('./routes'));
 

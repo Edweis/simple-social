@@ -12,11 +12,17 @@ const testUser = {
   username: 'Bruce Wayne',
 };
 
-beforeAll(done => {
+beforeAll(async done => {
   // FIXME route to another database for tests
-  mongoose.connection.collections.users.drop(() => {
-    done();
-  });
+  await Promise.all([
+    mongoose.connection.collections.users.drop(() =>
+      console.debug('DROPED Users'),
+    ),
+    mongoose.connection.collections.posts.drop(() =>
+      console.debug('DROPED Posts'),
+    ),
+  ]);
+  done();
 });
 
 const createUser = () =>
@@ -48,7 +54,7 @@ const logout = () =>
   });
 
 let header = null;
-describe('User connexion', () => {
+describe('Users', () => {
   createUser();
   it('should connect with token', done => {
     chai
@@ -103,5 +109,38 @@ describe('Health', () => {
 
   it('should shouw not connected when token is revoked', done => {
     checkHealth(done, true, header);
+  });
+});
+
+describe('Posts', () => {
+  const listPosts = async () => {
+    const response = await chai
+      .request(app)
+      .get('/api/posts')
+      .set(header);
+    expect(response).to.have.status(200);
+    return response.body;
+  };
+  const post = {
+    title: 'Here is a title',
+    description: 'Here is the description',
+  };
+  createUser();
+  it('should have no posts', async done => {
+    const posts = await listPosts();
+    expect(posts.length).to.equals(0);
+    done();
+  });
+
+  it.skip('should post a status', done => {
+    chai
+      .request(app)
+      .post('/api/posts')
+      .set(header)
+      .send({ post })
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        done();
+      });
   });
 });
