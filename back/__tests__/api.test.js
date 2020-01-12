@@ -40,7 +40,7 @@ const logout = () =>
   it('should logout', done => {
     chai
       .request(app)
-      .post('/api/logout')
+      .get('/api/users/logout')
       .end((err, res) => {
         expect(res).to.have.status(200);
         done();
