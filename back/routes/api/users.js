@@ -6,7 +6,7 @@ const auth = require('../auth');
 const Users = mongoose.model('Users');
 
 // POST new user route (optional, everyone has access)
-router.post('/', auth.optional, async (req, res) => {
+router.post('/', auth.optional, (req, res) => {
   const {
     body: { user },
   } = req;
@@ -20,8 +20,9 @@ router.post('/', auth.optional, async (req, res) => {
   const finalUser = new Users(user);
 
   finalUser.setPassword(user.password);
-  await finalUser.save();
-  return res.json({ user: finalUser.toAuthJSON() });
+  return finalUser
+    .save()
+    .then(() => res.json({ user: finalUser.toAuthJSON() }));
 });
 
 // POST login route (optional, everyone has access)

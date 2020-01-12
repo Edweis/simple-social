@@ -34,14 +34,22 @@ app.use(
 if (!isProduction) app.use(errorHandler());
 
 // Configure Mongoose
-mongoose.connect('mongodb://localhost/test', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost/test', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', () => console.debug('CONNECTED'));
 mongoose.set('debug', true);
 require('./models/Users');
 require('./config/passport');
 app.use(require('./routes'));
+
+// health endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'success', message: 'up' });
+});
 
 // Error handlers & middlewares
 if (!isProduction) {
@@ -57,3 +65,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(8000, () => console.log('Server running on http://localhost:8000/'));
+
+module.exports = app;
