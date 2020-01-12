@@ -6,7 +6,7 @@ const auth = require('../auth');
 const Users = mongoose.model('Users');
 
 // POST new user route (optional, everyone has access)
-router.post('/', auth.optional, (req, res) => {
+router.post('/', auth.optional, async (req, res) => {
   const { body } = req;
   const { user } = body;
 
@@ -20,9 +20,8 @@ router.post('/', auth.optional, (req, res) => {
   const finalUser = new Users({ ...user, bio: 'the user has no bio' });
 
   finalUser.setPassword(user.password);
-  return finalUser
-    .save()
-    .then(() => res.json({ user: finalUser.toAuthJSON() }));
+  await finalUser.save();
+  return res.json({ user: finalUser.toAuthJSON() });
 });
 
 // POST login route (optional, everyone has access)
@@ -40,15 +39,14 @@ router.post('/login', auth.optional, (req, res, next) => {
     return res.status(422).json({ errors: { password: 'is required' } });
 
   return passport.authenticate(
-    'local',
+    'custom',
     { session: false },
-    (err, passportUser, info) => {
+    (err, passportUser) => {
       if (err) return next(err);
 
       if (passportUser) {
-        const user = passportUser;
-        user.token = passportUser.generateJWT();
-        return res.json({ user: user.toAuthJSON() });
+        const token = passportUser.generateJWT();
+        return res.json({ user: { ...passportUser.toAuthJSON(), token } });
       }
       return status(400).info;
     },
@@ -65,24 +63,40 @@ router.get('/current', auth.required, async (req, res) => {
   const {
     user: { id },
   } = req;
-
   const user = await Users.findById(id);
-
-  if (!user) return res.sendStatus(400);
   return res.json({ user: user.toAuthJSON() });
 });
+
+// GET current route (required, only authenticated users have access)
+// router.get('/current/info', auth.required, async (req, res) => {
+//   const {
+//     user: { id },
+//   } = req;
+//   const user = await Users.findById(id);
+//   if (!user) return res.sendStatus(400);
+//   return res.json({ user });
+// });
 
 router.post('/current', auth.required, async (req, res) => {
   const {
     user: { id },
   } = req;
-  const { bio } = req.body;
-
+  const { bio, subscription } = req.body;
   const user = await Users.findById(id);
 
-  user.set('bio', bio);
+  if (bio) user.set('bio', bio);
+  if (subscription) {
+    const subscribedUser = await Users.find({ username: subscription });
+    console.debug(subscribedUser);
+    if (subscribedUser.length !== 0)
+      user.set('subscriptions', [...user.subscriptions, subscription]);
+    else {
+      return res
+        .status(400)
+        .json({ errors: { subscription: 'username not found.' } });
+    }
+  }
   const finalUser = await user.save();
-  console.debug({ finalUser, bio });
   return res.json({ user: finalUser });
 });
 

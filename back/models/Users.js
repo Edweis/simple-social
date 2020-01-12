@@ -7,8 +7,10 @@ const { Schema } = mongoose;
 const UsersSchema = new Schema({
   email: String,
   hash: String,
+  username: String,
   salt: String,
   bio: String,
+  subscriptions: [String],
 });
 
 UsersSchema.methods.setPassword = function(password) {

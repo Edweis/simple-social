@@ -2,49 +2,40 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const app = require('../app');
+const { createUser, logout, login } = require('./helpers');
 
 const { expect } = chai;
 chai.use(chaiHttp);
-
+let header = null;
 const testUser = {
   email: 'batman@mail.com',
   password: '123123',
   username: 'Bruce Wayne',
 };
+const loginTest = () =>
+  login(testUser, h => {
+    header = h;
+  });
+
 const TEST_BIO = 'Here is my test bio for a user';
 
 beforeAll(async () => {
   // FIXME route to another database for tests
-  await Promise.all([
-    mongoose.connection.collections.users.drop(() => {}),
-    mongoose.connection.collections.posts.drop(() => {}),
-  ]);
+  try {
+    await mongoose.connection.collections.users.drop();
+    await mongoose.connection.collections.posts.drop();
+  } catch (err) {
+    console.debug('table didn\'t exist. nothing to drop.');
+  }
 });
 
-let header = null;
-const createUser = () =>
-  it('should create a user', async () => {
-    const res = await chai
-      .request(app)
-      .post('/api/users')
-      .send({ user: testUser });
-
-    expect(res).to.have.status(200);
-    expect(res.body.user.email).to.equals(testUser.email);
-    expect(res.body.user.token).to.not.be.undefined;
-
-    const { token } = res.body.user;
-    header = { Authorization: `Token ${token}` };
-  });
-
-const logout = () =>
-  it('should logout', async () => {
-    const res = await chai.request(app).get('/api/users/logout');
-    expect(res).to.have.status(200);
-  });
+describe('Before All YYY', () => {
+  it('xxx', () => {});
+  createUser(testUser);
+  loginTest();
+});
 
 describe('Users', () => {
-  createUser();
   it('should connect with token', async () => {
     const res = await chai
       .request(app)
@@ -85,7 +76,7 @@ describe('Health', () => {
     expect(res.body.message).to.equals('up');
     expect(res.body.isConnected).to.equals(isConnected);
   };
-  createUser();
+  loginTest();
   it('should validate health check', async () => {
     await checkHealth(false);
   });
@@ -114,7 +105,7 @@ describe('Posts', () => {
     title: 'Here is a title',
     description: 'Here is the description',
   };
-  createUser();
+  loginTest();
 
   it('should have no post', async () => {
     const posts = await listPosts();
@@ -144,5 +135,59 @@ describe('Posts', () => {
   it('should have one post', async () => {
     const posts = await listPosts();
     expect(posts.length).to.equals(1);
+  });
+});
+
+describe('Follow', () => {
+  const alice = {
+    email: 'alice@mail.com',
+    password: '123123',
+    username: 'Alice',
+  };
+  const bob = {
+    email: 'bob@mail.com',
+    password: '123123',
+    username: 'Bob',
+  };
+  loginTest();
+  createUser(alice);
+  createUser(bob);
+
+  const getSubsciptions = async () => {
+    const res = await chai
+      .request(app)
+      .get('/api/users/current/info')
+      .set(header);
+    expect(res).to.have.status(200);
+    return res.body.user.subscriptions;
+  };
+  it('should follow no one', async () => {
+    const subscriptions = await getSubsciptions();
+    expect(subscriptions.length).to.equals(0);
+  });
+
+  it('should follow alice', async () => {
+    const res = await chai
+      .request(app)
+      .post('/api/users/current')
+      .send({ subscription: alice.username })
+      .set(header);
+    expect(res).to.have.status(200);
+    expect(res.body.user.subscriptions).to.eql([alice.username]);
+  });
+
+  it('should fail if user doesnt exist', async () => {
+    const res = await chai
+      .request(app)
+      .post('/api/users/current')
+      .send({ subscription: 'xxx' })
+      .set(header);
+    expect(res).to.have.status(400);
+  });
+
+  it('should follow alice', async () => {
+    const subscriptions = await getSubsciptions();
+    expect(subscriptions.length).to.equals(1);
+    expect(subscriptions).to.eql([alice.username]);
   });
 });
