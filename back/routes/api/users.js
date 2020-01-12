@@ -7,9 +7,8 @@ const Users = mongoose.model('Users');
 
 // POST new user route (optional, everyone has access)
 router.post('/', auth.optional, (req, res) => {
-  const {
-    body: { user },
-  } = req;
+  const { body } = req;
+  const { user } = body;
 
   if (!user.email)
     return res.status(422).json({ errors: { email: 'is required' } });
@@ -28,9 +27,8 @@ router.post('/', auth.optional, (req, res) => {
 
 // POST login route (optional, everyone has access)
 router.post('/login', auth.optional, (req, res, next) => {
-  const {
-    body: { user },
-  } = req;
+  const { body } = req;
+  const { user } = body;
 
   if (!user.email && !user.username) {
     return res
