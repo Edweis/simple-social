@@ -47,8 +47,10 @@ require('./config/passport');
 app.use(require('./routes'));
 
 // health endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'success', message: 'up' });
+const auth = require('./routes/auth');
+
+app.get('/health', auth.optional, (req, res) => {
+  res.json({ status: 'success', message: 'up', isConnected: req.user != null });
 });
 
 // Error handlers & middlewares

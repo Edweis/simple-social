@@ -5,8 +5,10 @@ const getTokenFromHeaders = req => {
     headers: { authorization },
   } = req;
 
-  if (authorization && authorization.split(' ')[0] === 'Token')
+  if (authorization && authorization.split(' ')[0] === 'Token') {
+    console.debug('Has authorizartion !');
     return authorization.split(' ')[1];
+  }
 
   return null;
 };
@@ -14,12 +16,10 @@ const getTokenFromHeaders = req => {
 const auth = {
   required: jwt({
     secret: 'secret',
-    userProperty: 'payload',
     getToken: getTokenFromHeaders,
   }),
   optional: jwt({
     secret: 'secret',
-    userProperty: 'payload',
     getToken: getTokenFromHeaders,
     credentialsRequired: false,
   }),

@@ -13,7 +13,8 @@ router.post('/', auth.optional, (req, res) => {
 
   if (!user.email)
     return res.status(422).json({ errors: { email: 'is required' } });
-
+  if (!user.username)
+    return res.status(422).json({ errors: { username: 'is required' } });
   if (!user.password)
     return res.status(422).json({ errors: { password: 'is required' } });
 
@@ -31,8 +32,11 @@ router.post('/login', auth.optional, (req, res, next) => {
     body: { user },
   } = req;
 
-  if (!user.email)
-    return res.status(422).json({ errors: { email: 'is required' } });
+  if (!user.email && !user.username) {
+    return res
+      .status(422)
+      .json({ errors: { email: 'is required (or username)' } });
+  }
 
   if (!user.password)
     return res.status(422).json({ errors: { password: 'is required' } });
@@ -56,7 +60,7 @@ router.post('/login', auth.optional, (req, res, next) => {
 // GET current route (required, only authenticated users have access)
 router.get('/current', auth.required, (req, res, next) => {
   const {
-    payload: { id },
+    user: { id },
   } = req;
 
   return Users.findById(id).then(user => {
