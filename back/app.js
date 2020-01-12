@@ -40,8 +40,7 @@ mongoose.connect('mongodb://localhost/test', {
 });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection error:'));
-db.once('open', () => console.debug('CONNECTED'));
-mongoose.set('debug', true);
+db.once('open', () => console.debug('Conected to mangoose'));
 require('./models/Users');
 require('./models/Posts');
 require('./config/passport');

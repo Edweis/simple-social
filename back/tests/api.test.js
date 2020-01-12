@@ -29,8 +29,7 @@ beforeAll(async () => {
   }
 });
 
-describe('Before All YYY', () => {
-  it('xxx', () => {});
+describe('Before All', () => {
   createUser(testUser);
   loginTest();
 });
@@ -156,13 +155,15 @@ describe('Follow', () => {
   const getSubsciptions = async () => {
     const res = await chai
       .request(app)
-      .get('/api/users/current/info')
+      .get('/api/users/current')
       .set(header);
     expect(res).to.have.status(200);
+    console.debug('should follow no one', res.body.user);
     return res.body.user.subscriptions;
   };
   it('should follow no one', async () => {
     const subscriptions = await getSubsciptions();
+
     expect(subscriptions.length).to.equals(0);
   });
 

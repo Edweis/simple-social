@@ -58,7 +58,6 @@ router.get('/logout', function(req, res) {
   res.sendStatus(200);
 });
 
-// GET current route (required, only authenticated users have access)
 router.get('/current', auth.required, async (req, res) => {
   const {
     user: { id },
@@ -87,7 +86,6 @@ router.post('/current', auth.required, async (req, res) => {
   if (bio) user.set('bio', bio);
   if (subscription) {
     const subscribedUser = await Users.find({ username: subscription });
-    console.debug(subscribedUser);
     if (subscribedUser.length !== 0)
       user.set('subscriptions', [...user.subscriptions, subscription]);
     else {
