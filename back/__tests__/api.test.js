@@ -19,7 +19,7 @@ beforeAll(done => {
   });
 });
 
-const createUser = () => {
+const createUser = () =>
   it('should create a user', done => {
     chai
       .request(app)
@@ -35,7 +35,17 @@ const createUser = () => {
         done();
       });
   });
-};
+
+const logout = () =>
+  it('should logout', done => {
+    chai
+      .request(app)
+      .post('/api/logout')
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        done();
+      });
+  });
 
 let header = null;
 describe('User connexion', () => {
@@ -63,43 +73,35 @@ describe('User connexion', () => {
       });
   });
 
-  it.skip('should logout', done => {
-    chai
-      .request(app)
-      .post('/api/logout')
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        done();
-      });
-  });
+  logout();
 });
 
 describe('Health', () => {
+  const checkHealth = (done, isConnected, headerToSet = {}) => {
+    chai
+      .request(app)
+      .get('/health')
+      .set(headerToSet)
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.body.status).to.equals('success');
+        expect(res.body.message).to.equals('up');
+        expect(res.body.isConnected).to.equals(isConnected);
+        done();
+      });
+  };
   createUser();
   it('should validate health check', done => {
-    chai
-      .request(app)
-      .get('/health')
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equals('success');
-        expect(res.body.message).to.equals('up');
-        expect(res.body.isConnected).to.equals(false);
-        done();
-      });
+    checkHealth(done, false);
   });
 
-  it('should shouw if user is connected', done => {
-    chai
-      .request(app)
-      .get('/health')
-      .set(header)
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equals('success');
-        expect(res.body.message).to.equals('up');
-        expect(res.body.isConnected).to.equals(true);
-        done();
-      });
+  it('should show if user is connected', done => {
+    checkHealth(done, true, header);
+  });
+
+  logout();
+
+  it('should shouw not connected when token is revoked', done => {
+    checkHealth(done, true, header);
   });
 });
