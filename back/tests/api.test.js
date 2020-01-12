@@ -158,7 +158,6 @@ describe('Follow', () => {
       .get('/api/users/current')
       .set(header);
     expect(res).to.have.status(200);
-    console.debug('should follow no one', res.body.user);
     return res.body.user.subscriptions;
   };
   it('should follow no one', async () => {
@@ -190,5 +189,20 @@ describe('Follow', () => {
     const subscriptions = await getSubsciptions();
     expect(subscriptions.length).to.equals(1);
     expect(subscriptions).to.eql([alice.username]);
+  });
+
+  it('should unfollow', async () => {
+    const res = await chai
+      .request(app)
+      .delete('/api/users/current')
+      .send({ subscription: alice.username })
+      .set(header);
+    expect(res).to.have.status(200);
+  });
+
+  it('should follow no one', async () => {
+    const subscriptions = await getSubsciptions();
+
+    expect(subscriptions.length).to.equals(0);
   });
 });

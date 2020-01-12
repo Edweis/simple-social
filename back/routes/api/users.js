@@ -66,15 +66,23 @@ router.get('/current', auth.required, async (req, res) => {
   return res.json({ user: user.toAuthJSON() });
 });
 
-// GET current route (required, only authenticated users have access)
-// router.get('/current/info', auth.required, async (req, res) => {
-//   const {
-//     user: { id },
-//   } = req;
-//   const user = await Users.findById(id);
-//   if (!user) return res.sendStatus(400);
-//   return res.json({ user });
-// });
+router.delete('/current', auth.required, async (req, res) => {
+  const {
+    user: { id },
+  } = req;
+  const user = await Users.findById(id);
+
+  const { subscription } = req.body;
+  if (subscription && user.subscriptions.includes(subscription)) {
+    user.set(
+      'subscriptions',
+      user.subscriptions.filter(s => s !== subscription),
+    );
+  }
+
+  const finalUser = await user.save();
+  return res.json({ user: finalUser });
+});
 
 router.post('/current', auth.required, async (req, res) => {
   const {
