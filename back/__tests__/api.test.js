@@ -11,6 +11,7 @@ const testUser = {
   password: '123123',
   username: 'Bruce Wayne',
 };
+const TEST_BIO = 'Here is my test bio for a user';
 
 beforeAll(async () => {
   // FIXME route to another database for tests
@@ -61,7 +62,16 @@ describe('Users', () => {
     expect(res).to.have.status(401);
   });
 
-  logout();
+  it('should be able to edit bio', async () => {
+    const res = await chai
+      .request(app)
+      .post('/api/users/current')
+      .send({ bio: TEST_BIO })
+      .set(header);
+    expect(res).to.have.status(200);
+    expect(res.body.user.email).to.equals(testUser.email);
+    expect(res.body.user.bio).to.equals(TEST_BIO);
+  });
 });
 
 describe('Health', () => {

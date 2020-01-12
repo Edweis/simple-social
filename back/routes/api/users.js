@@ -17,7 +17,7 @@ router.post('/', auth.optional, (req, res) => {
   if (!user.password)
     return res.status(422).json({ errors: { password: 'is required' } });
 
-  const finalUser = new Users(user);
+  const finalUser = new Users({ ...user, bio: 'the user has no bio' });
 
   finalUser.setPassword(user.password);
   return finalUser
@@ -61,16 +61,29 @@ router.get('/logout', function(req, res) {
 });
 
 // GET current route (required, only authenticated users have access)
-router.get('/current', auth.required, (req, res, next) => {
+router.get('/current', auth.required, async (req, res) => {
   const {
     user: { id },
   } = req;
 
-  return Users.findById(id).then(user => {
-    if (!user) return res.sendStatus(400);
+  const user = await Users.findById(id);
 
-    return res.json({ user: user.toAuthJSON() });
-  });
+  if (!user) return res.sendStatus(400);
+  return res.json({ user: user.toAuthJSON() });
+});
+
+router.post('/current', auth.required, async (req, res) => {
+  const {
+    user: { id },
+  } = req;
+  const { bio } = req.body;
+
+  const user = await Users.findById(id);
+
+  user.set('bio', bio);
+  const finalUser = await user.save();
+  console.debug({ finalUser, bio });
+  return res.json({ user: finalUser });
 });
 
 module.exports = router;
