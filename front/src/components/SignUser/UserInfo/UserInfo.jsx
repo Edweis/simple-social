@@ -1,4 +1,5 @@
 import React from 'react';
+import BioEditor from './BioEditor';
 
 const UserInfo = ({ user, logout }) => {
   return (
@@ -11,12 +12,13 @@ const UserInfo = ({ user, logout }) => {
         <b>email : </b>
         <span>{user.email}</span>
       </p>
-      <p>
-        <BioEditor>
+      <BioEditor>
+        <p>
           <b>bio : </b>
           <span>{user.bio}</span>
-        </BioEditor>
-      </p>
+        </p>
+      </BioEditor>
+      <input type="submit" value="Logout" onClick={logout} />
     </div>
   );
 };

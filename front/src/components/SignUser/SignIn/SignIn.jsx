@@ -20,7 +20,7 @@ const SignIn = ({ login }) => {
             type="text"
             name="name"
             value={identifier}
-            onChange={setIdentifier}
+            onChange={e => setIdentifier(e.target.value)}
           />
         </label>
         <label>
@@ -29,10 +29,10 @@ const SignIn = ({ login }) => {
             type="password"
             name="name"
             value={password}
-            onChange={setPassword}
+            onChange={e => setPassword(e.target.value)}
           />
         </label>
-        <input type="submit" value="Submit" onClick={submitLogin} />
+        <input type="button" value="Submit" onClick={submitLogin} />
       </form>
     </div>
   );
