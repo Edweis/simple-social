@@ -1,0 +1,21 @@
+.app-container {
+  border: 1px solid blue;
+
+  .title {
+    text-align: center;
+  }
+  .content {
+    display: flex;
+    flex-direction: row;
+    height: 300px;
+    .left-pane {
+      border: 1px solid green;
+      flex-grow: 1;
+    }
+    .main-pane {
+      border: 1px solid yellow;
+      flex-grow: 2;
+    }
+  }
+
+}
