@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const router = require('express').Router();
 const auth = require('../auth');
+const { checkIsEmail } = require('./helpers');
 
 const Users = mongoose.model('Users');
 
@@ -10,8 +11,12 @@ router.post('/', auth.optional, async (req, res) => {
   const { body } = req;
   const { user } = body;
 
-  if (!user.email)
-    return res.status(422).json({ errors: { email: 'is required' } });
+  if (!user) return res.status(422).json({ errors: { user: 'is required' } });
+  if (!user.email || !checkIsEmail(user.email)) {
+    return res
+      .status(422)
+      .json({ errors: { email: 'is required as an email' } });
+  }
   if (!user.username)
     return res.status(422).json({ errors: { username: 'is required' } });
   if (!user.password)
