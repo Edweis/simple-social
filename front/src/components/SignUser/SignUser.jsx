@@ -10,7 +10,7 @@ const SignUser = ({ loggedUser, setLoggedUser }) => {
   const [isSignUpShown, setIsSignUpShown] = useState(false);
 
   const login = user => {
-    console.debug('Login...');
+    console.debug('Login...', user);
     const richUser = {
       email: 'email@test.com',
       username: 'Batman',
