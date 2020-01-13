@@ -5,6 +5,7 @@ const auth = require('../auth');
 const Posts = mongoose.model('Posts');
 const Users = mongoose.model('Users');
 
+// good for tests, not what we want in production
 router.get('', auth.required, async (req, res) => {
   const posts = await Posts.find();
   return res.send(posts);

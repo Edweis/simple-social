@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import FollowLink from './FollowLink';
 import { get } from '../../apiCalls';
 
-const ListUsers = ({ subscriptions, updateUser }) => {
+const ListUsers = ({ subscriptions, updateUser, isConnected }) => {
   const [users, setUsers] = useState([]);
   useEffect(() => {
-    get();
-    // hacky, we update when the subscription changes (meaning the user might have changed)
-  }, [subscriptions]);
+    const fetchUsers = async () => {
+      if (isConnected) {
+        const response = await get('/api/users/list');
+        const payload = await response.json();
+        setUsers(payload.users);
+      }
+    };
+    fetchUsers();
+  }, [isConnected]);
 
   if (users.length === 0) return <p>No user registrated yet.</p>;
   return (

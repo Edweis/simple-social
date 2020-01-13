@@ -10,6 +10,8 @@ function App() {
     console.debug({ partialUser });
     setLoggedUser(currentUser => ({ ...currentUser, ...partialUser }));
   };
+  const isConnected = loggedUser != null;
+  const subscriptions = loggedUser ? loggedUser.subscriptions : [];
   return (
     <div className="app-container">
       <h1 className="title">Simple Social</h1>
@@ -21,12 +23,13 @@ function App() {
             updateUser={updateUser}
           />
           <ListUsers
+            isConnected={isConnected}
             updateUser={updateUser}
-            subscriptions={loggedUser ? loggedUser.subscriptions : []}
+            subscriptions={subscriptions}
           />
         </div>
         <div className="main-pane">
-          <Posts />
+          <Posts isConnected={isConnected} subscriptions={subscriptions} />
         </div>
       </div>
     </div>
