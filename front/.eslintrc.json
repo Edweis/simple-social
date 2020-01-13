@@ -26,6 +26,7 @@
       "quotes": ["error", "single"],
       "prettier/prettier": [ "error", { "singleQuote": true, "trailingComma": "all" } ],
       "curly": ["error", "multi-or-nest"],
-      "react/jsx-one-expression-per-line": "off"
+      "react/jsx-one-expression-per-line": "off",
+      "import/prefer-default-export": "off"
     }
 }
