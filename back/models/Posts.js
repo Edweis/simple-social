@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const PostSchema = new Schema({
   title: String,
   description: String,
-  authorEmail: String,
+  authorUsername: String,
 });
 
 mongoose.model('Posts', PostSchema);

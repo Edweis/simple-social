@@ -13,6 +13,6 @@ passport.use(
         errors: { 'email/username or password': 'is invalid' },
       });
     }
-    done(null, user);
+    return done(null, user);
   }),
 );

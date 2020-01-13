@@ -2,7 +2,16 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const app = require('../app');
-const { createUser, logout, login } = require('./helpers');
+const {
+  createUser,
+  logout,
+  login,
+  follow,
+  unfollow,
+  postStatus,
+  getSubsciptions,
+  listPosts,
+} = require('./helpers');
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -16,6 +25,22 @@ const loginTest = () =>
   login(testUser, h => {
     header = h;
   });
+
+const alice = {
+  email: 'alice@mail.com',
+  password: '123123',
+  username: 'Alice',
+};
+const bob = {
+  email: 'bob@mail.com',
+  password: '123123',
+  username: 'Bob',
+};
+
+const postDummy = {
+  title: 'Here is a title',
+  description: 'Here is the description',
+};
 
 const TEST_BIO = 'Here is my test bio for a user';
 
@@ -92,117 +117,109 @@ describe('Health', () => {
 });
 
 describe('Posts', () => {
-  const listPosts = async () => {
-    const response = await chai
-      .request(app)
-      .get('/api/posts')
-      .set(header);
-    expect(response).to.have.status(200);
-    return response.body;
-  };
-  const post = {
-    title: 'Here is a title',
-    description: 'Here is the description',
-  };
   loginTest();
 
   it('should have no post', async () => {
-    const posts = await listPosts();
+    const posts = await listPosts(header);
     expect(posts.length).to.equals(0);
   });
 
   it('should not post if not authenticated', async () => {
-    const res = await chai
-      .request(app)
-      .post('/api/posts')
-      .send({ post });
+    const res = await postStatus(postDummy, {});
     expect(res).to.have.status(401);
   });
 
   it('should post a status', async () => {
-    const res = await chai
-      .request(app)
-      .post('/api/posts')
-      .set(header)
-      .send({ post });
-
+    const res = await postStatus(postDummy, header);
     expect(res).to.have.status(200);
-    expect(res.body.title).to.equals(post.title);
-    expect(res.body.authorEmail).to.equals(testUser.email);
+    expect(res.body.title).to.equals(postDummy.title);
+    expect(res.body.authorUsername).to.equals(testUser.username);
   });
 
   it('should have one post', async () => {
-    const posts = await listPosts();
+    const posts = await listPosts(header);
     expect(posts.length).to.equals(1);
   });
 });
 
 describe('Follow', () => {
-  const alice = {
-    email: 'alice@mail.com',
-    password: '123123',
-    username: 'Alice',
-  };
-  const bob = {
-    email: 'bob@mail.com',
-    password: '123123',
-    username: 'Bob',
-  };
   loginTest();
   createUser(alice);
   createUser(bob);
 
-  const getSubsciptions = async () => {
-    const res = await chai
-      .request(app)
-      .get('/api/users/current')
-      .set(header);
-    expect(res).to.have.status(200);
-    return res.body.user.subscriptions;
-  };
   it('should follow no one', async () => {
-    const subscriptions = await getSubsciptions();
+    const subscriptions = await getSubsciptions(header);
 
     expect(subscriptions.length).to.equals(0);
   });
 
   it('should follow alice', async () => {
-    const res = await chai
-      .request(app)
-      .post('/api/users/current')
-      .send({ subscription: alice.username })
-      .set(header);
+    const res = await follow(alice.username, header);
     expect(res).to.have.status(200);
     expect(res.body.user.subscriptions).to.eql([alice.username]);
   });
 
   it('should fail if user doesnt exist', async () => {
-    const res = await chai
-      .request(app)
-      .post('/api/users/current')
-      .send({ subscription: 'xxx' })
-      .set(header);
+    const res = await follow('xxx', header);
     expect(res).to.have.status(400);
   });
 
   it('should follow alice', async () => {
-    const subscriptions = await getSubsciptions();
+    const subscriptions = await getSubsciptions(header);
     expect(subscriptions.length).to.equals(1);
     expect(subscriptions).to.eql([alice.username]);
   });
 
   it('should unfollow', async () => {
-    const res = await chai
-      .request(app)
-      .delete('/api/users/current')
-      .send({ subscription: alice.username })
-      .set(header);
+    const res = await unfollow(alice.username, header);
     expect(res).to.have.status(200);
   });
 
   it('should follow no one', async () => {
-    const subscriptions = await getSubsciptions();
+    const subscriptions = await getSubsciptions(header);
 
     expect(subscriptions.length).to.equals(0);
+  });
+});
+
+describe('Timeline', () => {
+  // everyone create one post, and test user follows alice
+  const postTest = { title: 'From Batman', description: 'Hello' };
+  const postAlice = { title: 'From Alice', description: 'Hi all' };
+  const postBob = { title: 'From Bob', description: 'Hi everyone' };
+  let otherUserHeader;
+  it('should setup posts', async () => {
+    await follow(alice.username, header);
+    await postStatus(postTest, header);
+  });
+  logout();
+  login(alice, h => {
+    otherUserHeader = h;
+  });
+
+  it('alice should post a status', async () => {
+    await postStatus(postAlice, otherUserHeader);
+  });
+  logout();
+  login(bob, h => {
+    otherUserHeader = h;
+  });
+  it('bob should post a status', async () => {
+    await postStatus(postBob, otherUserHeader);
+  });
+  loginTest();
+
+  it('should display posts on timeline', async () => {
+    const res = await chai
+      .request(app)
+      .get('/api/posts/timeline')
+      .set(header);
+    expect(res).to.have.status(200);
+    expect(res.body.posts.length).to.equals(3);
+    expect(res.body.posts.map(p => p.title)).to.eql([
+      postDummy.title,
+      postTest.title,
+      postAlice.title,
+    ]);
   });
 });

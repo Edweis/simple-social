@@ -54,16 +54,11 @@ app.get('/health', auth.optional, (req, res) => {
 });
 
 // Error handlers & middlewares
-if (!isProduction) {
-  app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.json({ errors: { message: err.message, error: err } });
-  });
-}
-
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.json({ errors: { message: err.message, error: {} } });
+  res.json({
+    errors: { message: err.message, error: isProduction ? {} : err },
+  });
 });
 
 app.listen(8000, () => console.log('Server running on http://localhost:8000/'));

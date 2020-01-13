@@ -39,4 +39,54 @@ const login = (user, setHeader) =>
     setHeader({ Authorization: `Token ${token}` });
   });
 
-module.exports = { header, createUser, logout, login };
+const follow = async (username, localHeader) => {
+  return chai
+    .request(app)
+    .post('/api/users/current')
+    .send({ subscription: username })
+    .set(localHeader);
+};
+
+const unfollow = async (username, localHeader) =>
+  chai
+    .request(app)
+    .delete('/api/users/current')
+    .send({ subscription: username })
+    .set(localHeader);
+
+const getSubsciptions = async localHeader => {
+  const res = await chai
+    .request(app)
+    .get('/api/users/current')
+    .set(localHeader);
+  expect(res).to.have.status(200);
+  return res.body.user.subscriptions;
+};
+
+const postStatus = async (post, localHeader) =>
+  chai
+    .request(app)
+    .post('/api/posts')
+    .set(localHeader)
+    .send({ post });
+
+const listPosts = async localHeader => {
+  const response = await chai
+    .request(app)
+    .get('/api/posts')
+    .set(localHeader);
+  expect(response).to.have.status(200);
+  return response.body;
+};
+
+module.exports = {
+  header,
+  createUser,
+  logout,
+  login,
+  follow,
+  unfollow,
+  getSubsciptions,
+  postStatus,
+  listPosts,
+};
