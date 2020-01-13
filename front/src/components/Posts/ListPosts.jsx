@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { get } from '../../apiCalls';
 
-const ListPosts = ({ isConnected, subscriptions }) => {
-  const [posts, setPosts] = useState([]);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const result = await get('/api/posts/timeline');
-      const payload = await result.json();
-      console.debug({ payload, isConnected });
-      setPosts(payload.posts);
-    };
-    console.debug('updating', { subscriptions });
-    if (isConnected) fetchPosts();
-  }, [isConnected, subscriptions]);
-
-  if (!isConnected) return 'Please login to see posts.';
+const ListPosts = ({ posts }) => {
   if (!posts.length) return 'No post to display.';
   return (
     <ul>
