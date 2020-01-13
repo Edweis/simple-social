@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { checkIsEmail } from './helpers';
+import './signIn.scss';
 
 const SignIn = ({ login }) => {
   const [identifier, setIdentifier] = useState('');

@@ -1,5 +1,9 @@
 .container {
   form {
     display: flex;
+    flex-direction: column;
+    input {
+      align-self: baseline;
+    }
   }
 }
