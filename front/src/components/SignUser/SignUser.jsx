@@ -7,17 +7,9 @@ import SignIn from './SignIn';
 const SignUser = ({ loggedUser, setLoggedUser }) => {
   const isConnected = loggedUser != null;
   const logout = () => setLoggedUser(null);
+  const login = user =>
+    console.debug('setLoggedUser', { user }) || setLoggedUser(user);
   const [isSignUpShown, setIsSignUpShown] = useState(false);
-
-  const login = user => {
-    console.debug('Login...', user);
-    const richUser = {
-      email: 'email@test.com',
-      username: 'Batman',
-      bio: 'Here is my bio',
-    };
-    setLoggedUser(richUser);
-  };
 
   if (isConnected) return <UserInfo user={loggedUser} logout={logout} />;
   return isSignUpShown ? (

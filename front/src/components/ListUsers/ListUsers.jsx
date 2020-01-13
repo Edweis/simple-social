@@ -16,7 +16,7 @@ const ListUsers = () => {
   return (
     <ul>
       {users.map(user => (
-        <li>
+        <li key={user.username}>
           <b>{user.email}</b>
           <span> - {user.bio} - </span>
           <FollowLink username={user.username} subscriptions={subscriptions} />

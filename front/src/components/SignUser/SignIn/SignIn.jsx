@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { checkIsEmail } from './helpers';
 import './signIn.scss';
+import { post } from '../../../apiCalls';
 
 const SignIn = ({ login }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const submitLogin = () => {
+  const [message, setMessage] = useState(null);
+  const submitLogin = async () => {
     const isEmail = checkIsEmail(identifier);
     const user = { password };
     if (isEmail) user.email = identifier;
     else user.username = identifier;
-    login(user);
+    const response = await post('/api/users/login', { user });
+    if (response.status !== 200)
+      setMessage('An error occured, check your credentials.');
+    else {
+      const richUser = await response.json();
+      login(richUser.user);
+    }
   };
   return (
     <div className="container">
@@ -33,6 +41,7 @@ const SignIn = ({ login }) => {
             onChange={e => setPassword(e.target.value)}
           />
         </label>
+        {message != null && <span>{message}</span>}
         <input type="button" value="Submit" onClick={submitLogin} />
       </form>
     </div>

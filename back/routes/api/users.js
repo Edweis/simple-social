@@ -12,19 +12,26 @@ router.post('/', auth.optional, async (req, res) => {
   const { user } = body;
 
   if (!user) return res.status(422).json({ errors: { user: 'is required' } });
-  if (!user.email || !checkIsEmail(user.email)) {
+  const { email, username, password } = user;
+  if (!email || !checkIsEmail(email)) {
     return res
       .status(422)
       .json({ errors: { email: 'is required as an email' } });
   }
-  if (!user.username)
+  if (!username)
     return res.status(422).json({ errors: { username: 'is required' } });
-  if (!user.password)
+  if (!password)
     return res.status(422).json({ errors: { password: 'is required' } });
 
+  const existingUser = await Users.findOne({ $or: [{ email }, { username }] });
+  if (existingUser != null) {
+    return res
+      .status(422)
+      .json({ errors: 'Yout email or username already exists.' });
+  }
   const finalUser = new Users({ ...user, bio: 'the user has no bio' });
 
-  finalUser.setPassword(user.password);
+  finalUser.setPassword(password);
   await finalUser.save();
   return res.json({ user: finalUser.toAuthJSON() });
 });
@@ -53,7 +60,7 @@ router.post('/login', auth.optional, (req, res, next) => {
         const token = passportUser.generateJWT();
         return res.json({ user: { ...passportUser.toAuthJSON(), token } });
       }
-      return status(400).info;
+      return res.status(400).json();
     },
   )(req, res, next);
 });
