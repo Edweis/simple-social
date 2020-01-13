@@ -54,4 +54,13 @@ UsersSchema.methods.toAuthJSON = function() {
   };
 };
 
+UsersSchema.methods.publicJSON = function() {
+  return {
+    _id: this._id,
+    email: this.email,
+    username: this.username,
+    bio: this.bio,
+    subscriptions: this.subscriptions,
+  };
+};
 mongoose.model('Users', UsersSchema);

@@ -87,6 +87,16 @@ describe('Users', () => {
     expect(res.body.user.email).to.equals(testUser.email);
     expect(res.body.user.bio).to.equals(TEST_BIO);
   });
+
+  it('should get the list of users', async () => {
+    const res = await chai
+      .request(app)
+      .get('/api/users/list')
+      .set(header);
+    expect(res).to.have.status(200);
+    expect(res.body.users.map(u => u.email)).to.eql([testUser.email]);
+    expect(res.body.users.filter(u => !!u.salt).length).to.eql(0);
+  });
 });
 
 describe('Health', () => {

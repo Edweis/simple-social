@@ -12,6 +12,14 @@ export const post = (url, body) =>
     headers,
     body: JSON.stringify(body),
   });
+
+export const remove = (url, body) =>
+  fetch(API_ROOT + url, {
+    method: 'DELETE',
+    headers,
+    body: JSON.stringify(body),
+  });
+
 export const setToken = token => {
   if (token == null) headers.Authorization = null;
   headers.Authorization = `Token ${token}`;

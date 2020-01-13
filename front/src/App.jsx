@@ -6,8 +6,9 @@ import Posts from './components/Posts';
 
 function App() {
   const [loggedUser, setLoggedUser] = useState(null);
-  const saveUserInfo = () => {
-    console.debug('saving Bio...');
+  const updateUser = partialUser => {
+    console.debug({ partialUser });
+    setLoggedUser(currentUser => ({ ...currentUser, ...partialUser }));
   };
   return (
     <div className="app-container">
@@ -17,9 +18,12 @@ function App() {
           <SignUser
             loggedUser={loggedUser}
             setLoggedUser={setLoggedUser}
-            saveUserInfo={saveUserInfo}
+            updateUser={updateUser}
           />
-          <ListUsers saveUserInfo={saveUserInfo} />
+          <ListUsers
+            updateUser={updateUser}
+            subscriptions={loggedUser ? loggedUser.subscriptions : []}
+          />
         </div>
         <div className="main-pane">
           <Posts />

@@ -78,6 +78,12 @@ router.get('/current', auth.required, async (req, res) => {
   return res.json({ user: user.toAuthJSON() });
 });
 
+router.get('/list', auth.required, async (req, res) => {
+  const users = await Users.find();
+  const publicUsers = users.map(user => user.publicJSON());
+  return res.json({ users: publicUsers });
+});
+
 router.delete('/current', auth.required, async (req, res) => {
   const {
     user: { id },

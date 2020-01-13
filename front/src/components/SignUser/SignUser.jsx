@@ -5,7 +5,7 @@ import SignUp from './SignUp';
 import SignIn from './SignIn';
 import { setToken } from '../../apiCalls';
 
-const SignUser = ({ loggedUser, setLoggedUser }) => {
+const SignUser = ({ loggedUser, setLoggedUser, updateUser }) => {
   const isConnected = loggedUser != null;
   const logout = () => {
     setLoggedUser(null);
@@ -14,10 +14,6 @@ const SignUser = ({ loggedUser, setLoggedUser }) => {
   const login = user => {
     setLoggedUser(user);
     setToken(user.token);
-  };
-  const updateUser = partialUser => {
-    console.debug({ partialUser });
-    setLoggedUser(currentUser => ({ ...currentUser, ...partialUser }));
   };
   const [isSignUpShown, setIsSignUpShown] = useState(false);
 

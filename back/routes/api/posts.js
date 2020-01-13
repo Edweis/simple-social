@@ -19,17 +19,12 @@ router.post('', auth.required, async (req, res) => {
   if (!post.description)
     return res.status(422).json({ errors: { description: 'is required' } });
 
-  console.debug(req.user);
   const { username } = req.user;
   const finalPost = await new Posts({
     ...post,
     authorUsername: username,
   }).save();
 
-  console.debug({
-    ...post,
-    authorUsername: username,
-  });
   return res.send(finalPost);
 });
 

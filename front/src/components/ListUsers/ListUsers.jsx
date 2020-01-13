@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FollowLink from './FollowLink';
+import { get } from '../../apiCalls';
 
-const sampleUser = {
-  email: 'batman@mail.com',
-  password: '123123',
-  username: 'Bruce Wayne',
-  bio: 'no bio',
-};
-const sampleSubs = [sampleUser.username];
-const ListUsers = () => {
-  const [subscriptions, setSubscriptions] = useState(sampleSubs);
-  const [users, setUsers] = useState([sampleUser]);
+const ListUsers = ({ subscriptions, updateUser }) => {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    get();
+    // hacky, we update when the subscription changes (meaning the user might have changed)
+  }, [subscriptions]);
 
   if (users.length === 0) return <p>No user registrated yet.</p>;
   return (
@@ -19,7 +16,11 @@ const ListUsers = () => {
         <li key={user.username}>
           <b>{user.email}</b>
           <span> - {user.bio} - </span>
-          <FollowLink username={user.username} subscriptions={subscriptions} />
+          <FollowLink
+            username={user.username}
+            subscriptions={subscriptions}
+            updateUser={updateUser}
+          />
         </li>
       ))}
     </ul>
