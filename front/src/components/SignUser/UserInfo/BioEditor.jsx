@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { post } from '../../../apiCalls';
 
-const BioEditor = ({ children, saveUserInfo }) => {
+const BioEditor = ({ children, updateUser }) => {
   const [isEditOn, setIsEditOn] = useState(false);
   const [bio, setBio] = useState('');
-  const saveBio = () => {
-    console.debug('API save bio...');
-    saveUserInfo({ bio });
+  const saveBio = async () => {
+    const results = await post('/api/users/current', { bio });
+    const payload = await results.json();
+    updateUser({ bio: payload.user.bio });
     setIsEditOn(false);
   };
 

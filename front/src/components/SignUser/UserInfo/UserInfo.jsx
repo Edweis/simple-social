@@ -1,7 +1,7 @@
 import React from 'react';
 import BioEditor from './BioEditor';
 
-const UserInfo = ({ user, logout }) => {
+const UserInfo = ({ user, logout, updateUser }) => {
   return (
     <div className="container">
       <p>
@@ -12,7 +12,7 @@ const UserInfo = ({ user, logout }) => {
         <b>email : </b>
         <span>{user.email}</span>
       </p>
-      <BioEditor>
+      <BioEditor updateUser={updateUser}>
         <p>
           <b>bio : </b>
           <span>{user.bio}</span>

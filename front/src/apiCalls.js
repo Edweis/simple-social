@@ -12,3 +12,7 @@ export const post = (url, body) =>
     headers,
     body: JSON.stringify(body),
   });
+export const setToken = token => {
+  if (token == null) headers.Authorization = null;
+  headers.Authorization = `Token ${token}`;
+};
