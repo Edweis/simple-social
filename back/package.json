@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "jest"
   },
   "author": "",
@@ -30,6 +31,7 @@
     "express-jwt": "^5.3.1",
     "express-session": "^1.17.0",
     "jsonwebtoken": "^8.5.1",
+    "minimist": "^1.2.0",
     "mongoose": "^5.8.7",
     "morgan": "^1.9.1",
     "passport": "^0.4.1",

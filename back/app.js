@@ -5,7 +5,14 @@ const session = require('express-session');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const errorHandler = require('errorhandler');
+const argv = require('minimist')(process.argv.slice(2));
 
+const isInDocker = argv.docker || false;
+console.log({ isInDocker });
+const dbUrl = isInDocker
+  ? 'mongodb://mongo:27017/test'
+  : 'mongodb://localhost/test';
+const port = isInDocker ? 8080 : 8000;
 // Configure mongoose's promise to global promise
 mongoose.promise = global.Promise;
 
@@ -34,7 +41,7 @@ app.use(
 if (!isProduction) app.use(errorHandler());
 
 // Configure Mongoose
-mongoose.connect('mongodb://localhost/test', {
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -61,6 +68,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(8000, () => console.log('Server running on http://localhost:8000/'));
+app.listen(port, () =>
+  console.log(`Server running on http://localhost:${port}/`),
+);
 
 module.exports = app;
