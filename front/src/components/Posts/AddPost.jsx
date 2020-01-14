@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { post as postAPI } from '../../apiCalls';
 
 const AddPost = ({ onSubmit }) => {

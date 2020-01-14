@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { get } from '../../apiCalls';
+import React from 'react';
 
 const ListPosts = ({ posts }) => {
   if (!posts.length) return 'No post to display.';

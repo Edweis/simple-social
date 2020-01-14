@@ -7,7 +7,6 @@ import Posts from './components/Posts';
 function App() {
   const [loggedUser, setLoggedUser] = useState(null);
   const updateUser = partialUser => {
-    console.debug({ partialUser });
     setLoggedUser(currentUser => ({ ...currentUser, ...partialUser }));
   };
   const isConnected = loggedUser != null;
