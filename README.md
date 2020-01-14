@@ -10,6 +10,7 @@ cd ../front/
 curl http://localhost:8000/health && \ # we make sure backend is started before running frontend
     npm start 
 pkill node #kills backend on front end exit
+cd ..
 ```
 
 ## Run on docker
@@ -20,6 +21,7 @@ docker compose up&
 cd ../front/
 curl http://localhost:8080/health && \ # we make sure backend is started before running frontend
    REACT_APP_IS_IN_DOCKER=true npm start 
+cd ..
 ```
 
 ## Run tests
