@@ -13,7 +13,7 @@ pkill node #kills backend on front end exit
 ```
 
 ## Run on docker
-Docker website is accessible through port `8080`.
+Dockerized API is accessible through port `8080`.
 ```
 cd back/
 docker compose up&
